@@ -44,7 +44,8 @@ class SQLiteProfileRepository:
 
     def exists(self, phone: str) -> bool:
         with sqlite3.connect(self.database_path) as connection:
-            return connection.execute("SELECT 1 FROM users WHERE phone = ?", (phone,)).fetchone() is not None
+            row = connection.execute("SELECT 1 FROM users WHERE phone = ?", (phone,)).fetchone()
+            return row is not None
 
 
 class MongoProfileRepository:
@@ -52,7 +53,9 @@ class MongoProfileRepository:
         self.collection = collection
 
     def save(self, profile: UserProfile) -> None:
-        self.collection.update_one({"phone": profile.phone}, {"$set": profile.model_dump()}, upsert=True)
+        self.collection.update_one(
+            {"phone": profile.phone}, {"$set": profile.model_dump()}, upsert=True
+        )
 
     def exists(self, phone: str) -> bool:
         return self.collection.find_one({"phone": phone}, {"_id": 1}) is not None

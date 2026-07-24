@@ -10,7 +10,8 @@ class UserProfile(BaseModel):
     @field_validator("phone")
     @classmethod
     def validate_phone(cls, value: str) -> str:
-        if len(value) != 11 or not value.isdigit() or not value.startswith(("010", "011", "012", "015")):
+        valid_prefix = value.startswith(("010", "011", "012", "015"))
+        if len(value) != 11 or not value.isdigit() or not valid_prefix:
             raise ValueError("Phone number must be 11 digits and start with 010, 011, 012, or 015.")
         return value
 
@@ -31,7 +32,6 @@ class ChatResponse(BaseModel):
 
 class RuntimeSettingsUpdate(BaseModel):
     google_api_key: str | None = Field(default=None, alias="GOOGLE_API_KEY")
-    mongo_uri: str | None = Field(default=None, alias="MONGO_URI")
     qdrant_url: str | None = Field(default=None, alias="QDRANT_URL")
     qdrant_api_key: str | None = Field(default=None, alias="QDRANT_API_KEY")
 

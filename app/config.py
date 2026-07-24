@@ -49,7 +49,8 @@ class AppConfig:
             "QDRANT_URL": "qdrant_url",
             "QDRANT_API_KEY": "qdrant_api_key",
         }
-        return replace(self, **{allowed[key]: value for key, value in values.items() if key in allowed})
+        overrides = {allowed[key]: value for key, value in values.items() if key in allowed}
+        return replace(self, **overrides)
 
     @property
     def is_production(self) -> bool:

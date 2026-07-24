@@ -7,9 +7,13 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    return request.app.state.templates.TemplateResponse(request, "index.html", {"title": "WE Telecom AI Agent"})
+    return request.app.state.templates.TemplateResponse(
+        request, "index.html", {"title": "WE Telecom AI Agent"}
+    )
 
 
 @router.get("/privacy", response_class=HTMLResponse)
 def privacy(request: Request):
-    return request.app.state.templates.TemplateResponse(request, "privacy.html", {"title": "Privacy"})
+    return request.app.state.templates.TemplateResponse(
+        request, "privacy.html", {"title": "Privacy"}
+    )

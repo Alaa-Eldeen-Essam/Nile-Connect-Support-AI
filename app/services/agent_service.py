@@ -47,7 +47,10 @@ class AgentService:
         )
         output = response["output"]
         if isinstance(output, list):
-            return "".join(item.get("text", str(item)) if isinstance(item, dict) else str(item) for item in output)
+            return "".join(
+                item.get("text", str(item)) if isinstance(item, dict) else str(item)
+                for item in output
+            )
         return str(output)
 
     def _build_agent(self):
@@ -74,15 +77,20 @@ class AgentService:
             """Save the customer profile before providing technical or billing help."""
             try:
                 profile_repository.save(UserProfile(name=name, phone=phone, age=age, city=city))
-                return f"Successfully saved user profile for {name}. You may now proceed to help them."
-            except Exception as error:  # Tool failures need a user-safe message for the agent.
-                return f"Database error: {error}"
+                return (
+                    f"Successfully saved user profile for {name}. You may now proceed to help them."
+                )
+            except Exception:  # Tool failures need a user-safe message for the agent.
+                return "Database error: the profile could not be saved. Ask the user to try again."
 
         @tool("submit_support_ticket", args_schema=Ticket)
         def submit_support_ticket(phone: str, issue_type: str, description: str) -> str:
             """Save a detailed customer support ticket after a known profile is available."""
             if not profile_repository.exists(phone):
-                return "Error: save and validate the customer's profile before submitting a ticket."
+                return (
+                    "Error: save and validate the customer's profile before "
+                    "submitting a ticket."
+                )
             ticket = {
                 "phone": phone,
                 "issue_type": issue_type,
@@ -96,7 +104,8 @@ class AgentService:
         search = create_retriever_tool(
             rag.vector_store().as_retriever(search_kwargs={"k": 3}),
             "search_we_knowledge_base",
-            "Search WE Telecom plans, router configuration, troubleshooting, and billing information.",
+            "Search WE Telecom plans, router configuration, troubleshooting, "
+            "and billing information.",
         )
         prompt = ChatPromptTemplate.from_messages(
             [

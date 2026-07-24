@@ -49,7 +49,7 @@ docker compose run --rm web python scripts/ingest_knowledge_base.py
 
 ## Runtime settings
 
-Visit `/settings` using any HTTP Basic username and `SETTINGS_ADMIN_TOKEN` as the password. Values are encrypted in MongoDB and never returned to the browser. Leave fields empty to preserve their existing values.
+Visit `/settings` using any HTTP Basic username and `SETTINGS_ADMIN_TOKEN` as the password. Gemini and optional Qdrant values are encrypted in MongoDB and never returned to the browser. Leave fields empty to preserve their existing values. `MONGO_URI` remains a deployment secret so the settings store is available after a restart.
 
 ## Deploy on Render
 

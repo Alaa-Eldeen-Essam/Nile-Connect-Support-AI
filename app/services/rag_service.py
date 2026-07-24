@@ -24,7 +24,9 @@ class RagService:
         if self.config.qdrant_mode == "local":
             client = QdrantClient(path=str(ROOT_DIR / "data" / "qdrant"))
         else:
-            client = QdrantClient(url=self.config.qdrant_url, api_key=self.config.qdrant_api_key or None)
+            client = QdrantClient(
+                url=self.config.qdrant_url, api_key=self.config.qdrant_api_key or None
+            )
 
         return QdrantVectorStore(
             client=client,
@@ -43,19 +45,25 @@ class RagService:
         if self.config.qdrant_mode == "local":
             client = QdrantClient(path=str(ROOT_DIR / "data" / "qdrant"))
         else:
-            client = QdrantClient(url=self.config.qdrant_url, api_key=self.config.qdrant_api_key or None)
+            client = QdrantClient(
+                url=self.config.qdrant_url, api_key=self.config.qdrant_api_key or None
+            )
         if client.collection_exists(self.config.qdrant_collection):
             return 0
 
         source_dir = ROOT_DIR / "knowledge_base"
         documents = [
-            Document(page_content=path.read_text(encoding="utf-8"), metadata={"source": str(path.name)})
+            Document(
+                page_content=path.read_text(encoding="utf-8"),
+                metadata={"source": str(path.name)},
+            )
             for path in source_dir.glob("*.md")
         ]
         if not documents:
             raise RuntimeError("No Markdown files were found in knowledge_base/.")
 
-        chunks = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(documents)
+        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        chunks = splitter.split_documents(documents)
         QdrantVectorStore.from_documents(
             chunks,
             HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2"),

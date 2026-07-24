@@ -10,7 +10,12 @@ COPY pyproject.toml ./
 COPY app ./app
 COPY knowledge_base ./knowledge_base
 COPY scripts ./scripts
-RUN pip install . && useradd --create-home appuser && mkdir -p /app/data && chown -R appuser:appuser /app
+# The default PyPI torch wheel pulls CUDA libraries. This CPU-only web app does not need them.
+RUN pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0+cpu \
+    && pip install . \
+    && useradd --create-home appuser \
+    && mkdir -p /app/data \
+    && chown -R appuser:appuser /app
 
 USER appuser
 EXPOSE 8000

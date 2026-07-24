@@ -27,15 +27,21 @@ class RuntimeSettingsStore:
         document = self.mongo.database["app_settings"].find_one({"_id": self.document_id})
         if not document:
             return {}
-        payload = Fernet(self.config.settings_encryption_key.encode()).decrypt(document["payload"])
+        cipher = Fernet(self.config.settings_encryption_key.encode())
+        payload = cipher.decrypt(document["payload"])
         return json.loads(payload.decode())
 
     def save(self, values: dict[str, str]) -> None:
         if not self.enabled:
-            raise RuntimeError("Runtime settings require SETTINGS_ENCRYPTION_KEY and SETTINGS_ADMIN_TOKEN.")
-        payload = Fernet(self.config.settings_encryption_key.encode()).encrypt(json.dumps(values).encode())
+            raise RuntimeError(
+                "Runtime settings require SETTINGS_ENCRYPTION_KEY and SETTINGS_ADMIN_TOKEN."
+            )
+        cipher = Fernet(self.config.settings_encryption_key.encode())
+        payload = cipher.encrypt(json.dumps(values).encode())
         self.mongo.database["app_settings"].replace_one(
-            {"_id": self.document_id}, {"_id": self.document_id, "payload": payload}, upsert=True
+            {"_id": self.document_id},
+            {"_id": self.document_id, "payload": payload},
+            upsert=True,
         )
 
     @staticmethod
