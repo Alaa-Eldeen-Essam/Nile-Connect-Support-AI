@@ -61,7 +61,6 @@ class AgentService:
 
         from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
         from langchain_core.runnables.history import RunnableWithMessageHistory
-        from langchain_core.tools import create_retriever_tool
         from langchain_google_genai import ChatGoogleGenerativeAI
         from langchain_mongodb import MongoDBChatMessageHistory
         from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
@@ -72,6 +71,14 @@ class AgentService:
         tickets = self.mongo.database["tickets"]
 
         from langchain.tools import tool
+
+        @tool("search_we_knowledge_base")
+        def search_we_knowledge_base(query: str) -> str:
+            """Search public telecom source material for support, router, billing, and plan questions."""
+            documents = rag.vector_store().similarity_search(query, k=3)
+            if not documents:
+                return "No relevant source material was found."
+            return "\n\n".join(document.page_content for document in documents)
 
         @tool("save_user_profile", args_schema=UserProfile)
         def save_user_profile(name: str, phone: str, age: int, city: str) -> str:
@@ -102,12 +109,6 @@ class AgentService:
             result = tickets.insert_one(ticket)
             return f"Successfully submitted support ticket. Ticket ID: {result.inserted_id}"
 
-        search = create_retriever_tool(
-            rag.vector_store().as_retriever(search_kwargs={"k": 3}),
-            "search_we_knowledge_base",
-            "Search public telecom source material, router configuration, "
-            "troubleshooting, and billing information.",
-        )
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", SYSTEM_PROMPT),
@@ -119,10 +120,10 @@ class AgentService:
         executor = AgentExecutor(
             agent=create_tool_calling_agent(
                 ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", temperature=0.2),
-                [search, save_user_profile, submit_support_ticket],
+                [search_we_knowledge_base, save_user_profile, submit_support_ticket],
                 prompt,
             ),
-            tools=[search, save_user_profile, submit_support_ticket],
+            tools=[search_we_knowledge_base, save_user_profile, submit_support_ticket],
             verbose=not config.is_production,
             handle_parsing_errors=True,
         )
