@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/css/app.css">
+  </head>
+  <body>
+    <main class="shell settings">
+      <p class="eyebrow">Administrator only</p>
+      <h1>Runtime settings</h1>
+      <p>Leave a field empty to retain its current value. Existing values are never shown.</p>
+      <form method="post" class="settings-form">
+        {% for key, state in settings.items() %}
+          <label>{{ key }} <small>{{ state }}</small><input name="{{ key }}" type="password" autocomplete="off"></label>
+        {% endfor %}
+        <button type="submit">Save and reload integrations</button>
+      </form>
+    </main>
+  </body>
+</html>

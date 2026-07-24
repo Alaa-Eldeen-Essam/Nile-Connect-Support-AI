@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: development
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: we_telecom_db
+      PROFILE_STORAGE: sqlite
+      SQLITE_PATH: data/we_telecom.db
+      QDRANT_MODE: container
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: we_knowledge_base
+      SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY:-}
+      SETTINGS_ADMIN_TOKEN: ${SETTINGS_ADMIN_TOKEN:-}
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      - mongo
+      - qdrant
+
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo_data:/data/db
+
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  app_data:
+  mongo_data:
+  qdrant_data:

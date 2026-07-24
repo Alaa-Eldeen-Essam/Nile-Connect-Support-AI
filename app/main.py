@@ -1,0 +1,28 @@
+from __future__ import annotations
+
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+from app.config import AppConfig, ROOT_DIR
+from app.controllers import chat, health, pages, settings
+from app.services.application import ApplicationServices
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.services = ApplicationServices(AppConfig.from_env())
+    app.state.services.load_runtime_settings()
+    yield
+    app.state.services.close()
+
+
+app = FastAPI(title="WE Telecom AI Agent", lifespan=lifespan)
+app.state.templates = Jinja2Templates(directory=str(ROOT_DIR / "app" / "templates"))
+app.mount("/static", StaticFiles(directory=str(ROOT_DIR / "app" / "static")), name="static")
+app.include_router(pages.router)
+app.include_router(chat.router)
+app.include_router(settings.router)
+app.include_router(health.router)
