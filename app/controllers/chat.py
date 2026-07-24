@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -12,6 +13,7 @@ from app.services.application import ApplicationServices
 
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
+logger = logging.getLogger(__name__)
 
 
 def session_id(request: Request) -> str:
@@ -30,8 +32,10 @@ async def chat(
             app_services.agent.reply, payload.message.strip(), current_session
         )
     except RuntimeError as error:
+        logger.warning("Chat request rejected: %s", error)
         raise HTTPException(status_code=503, detail=str(error)) from error
     except Exception as error:
+        logger.exception("Chat request failed")
         raise HTTPException(
             status_code=503, detail="The agent service is temporarily unavailable."
         ) from error

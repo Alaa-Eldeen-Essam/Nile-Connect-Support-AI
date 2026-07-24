@@ -10,16 +10,17 @@ from app.repositories.profiles import ProfileRepository
 from app.services.rag_service import RagService
 
 
-SYSTEM_PROMPT = """You are a customer-service AI demonstration for WE Telecom Egypt.
-You must be professional, concise, and clear that this is a portfolio demonstration.
+SYSTEM_PROMPT = """You are Nile Connect Support AI, an independent customer-support portfolio demonstration.
+You are not affiliated with, endorsed by, or operated by Telecom Egypt, WE, or another telecom provider.
+You must be professional and concise, and never claim to be an official company representative.
 
 Protocol:
 1. Before answering technical or billing questions, collect name, 11-digit Egyptian phone number,
    age, and city. Ask only for the fields that are missing.
 2. Once all fields are provided, immediately call save_user_profile. Do not provide technical or
    billing help until it succeeds.
-3. Use search_we_knowledge_base for telecom plans, router configuration, troubleshooting, and
-   billing. Do not invent policies.
+3. Use search_we_knowledge_base for public telecom source material, router configuration,
+   troubleshooting, and billing. Do not invent policies or claim provider affiliation.
 4. For complaints needing human follow-up, call submit_support_ticket and return its ticket ID.
 """
 
@@ -104,8 +105,8 @@ class AgentService:
         search = create_retriever_tool(
             rag.vector_store().as_retriever(search_kwargs={"k": 3}),
             "search_we_knowledge_base",
-            "Search WE Telecom plans, router configuration, troubleshooting, "
-            "and billing information.",
+            "Search public telecom source material, router configuration, "
+            "troubleshooting, and billing information.",
         )
         prompt = ChatPromptTemplate.from_messages(
             [

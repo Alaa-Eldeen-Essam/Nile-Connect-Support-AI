@@ -1,3 +1,11 @@
+FROM node:22-alpine AS frontend
+
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend ./
+RUN npm run build
+
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -10,6 +18,7 @@ COPY pyproject.toml ./
 COPY app ./app
 COPY knowledge_base ./knowledge_base
 COPY scripts ./scripts
+COPY --from=frontend /frontend/dist ./frontend_dist
 # The default PyPI torch wheel pulls CUDA libraries. This CPU-only web app does not need them.
 RUN pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0+cpu \
     && pip install . \

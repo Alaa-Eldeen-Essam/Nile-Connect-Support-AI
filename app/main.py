@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 from app.config import AppConfig, ROOT_DIR
 from app.controllers import chat, health, pages, settings
@@ -19,9 +18,12 @@ async def lifespan(app: FastAPI):
     app.state.services.close()
 
 
-app = FastAPI(title="WE Telecom AI Agent", lifespan=lifespan)
-app.state.templates = Jinja2Templates(directory=str(ROOT_DIR / "app" / "templates"))
-app.mount("/static", StaticFiles(directory=str(ROOT_DIR / "app" / "static")), name="static")
+app = FastAPI(title="Nile Connect Support AI", lifespan=lifespan)
+app.mount(
+    "/assets",
+    StaticFiles(directory=str(ROOT_DIR / "frontend_dist" / "assets"), check_dir=False),
+    name="assets",
+)
 app.include_router(pages.router)
 app.include_router(chat.router)
 app.include_router(settings.router)

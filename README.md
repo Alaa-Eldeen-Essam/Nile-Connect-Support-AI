@@ -1,18 +1,18 @@
-# WE Telecom AI Agent
+# Nile Connect Support AI
 
-A Dockerized FastAPI portfolio project extracted from the original LangChain notebook. It demonstrates a tool-calling customer-support agent with Gemini, Retrieval-Augmented Generation (RAG), profile validation, support tickets, and persisted chat history.
+A Dockerized FastAPI and React portfolio project extracted from the original LangChain notebook. It demonstrates a tool-calling customer-support agent with Gemini, Retrieval-Augmented Generation (RAG), profile validation, support tickets, and persisted chat history.
 
-> Educational demo only. It is not affiliated with or operated by WE Telecom. Do not enter real customer or account data.
+> Independent educational demonstration. Nile Connect Support AI is not affiliated with, endorsed by, or operated by Telecom Egypt, WE, or another telecom provider. The demonstration knowledge base is adapted from the public Kaggle dataset [WE Telecom Scraped Data](https://www.kaggle.com/datasets/mahmoudramadan025/we-telecom-scraped-data); it may be incomplete or inaccurate. Do not enter real customer, billing, or account data.
 
 ## Features
 
-- HTML, CSS, and JavaScript chat interface.
+- Premium single-screen React chat interface with a mobile layout and suggestion prompts.
 - Gemini tool-calling agent built from the original notebook logic.
 - RAG search over bundled Markdown demonstration content using Qdrant.
 - Egyptian phone and age validation with Pydantic.
 - SQLite profiles locally; MongoDB profiles for the hosted deployment.
 - MongoDB ticket and chat-history storage.
-- Protected, encrypted runtime integration settings.
+- Protected admin settings drawer with encrypted runtime integration settings.
 - Docker Compose local stack and a Render deployment blueprint.
 
 ## Architecture
@@ -27,6 +27,8 @@ The controller layer owns HTTP requests, templates are the view layer, and repos
 
 1. Copy `.env.example` to `.env`.
 2. Add `GOOGLE_API_KEY`.
+   Keep `QDRANT_API_KEY` empty when using the included local Docker Qdrant service.
+   Set both `QDRANT_URL` and `QDRANT_API_KEY` only when switching to Qdrant Cloud.
 3. Generate settings secrets if you want the admin settings page:
 
    ```bash
@@ -49,7 +51,7 @@ docker compose run --rm web python scripts/ingest_knowledge_base.py
 
 ## Runtime settings
 
-Visit `/settings` using any HTTP Basic username and `SETTINGS_ADMIN_TOKEN` as the password. Gemini and optional Qdrant values are encrypted in MongoDB and never returned to the browser. Leave fields empty to preserve their existing values. `MONGO_URI` remains a deployment secret so the settings store is available after a restart.
+Open the `•••` menu in the app, choose **Admin settings**, and enter `SETTINGS_ADMIN_TOKEN`. Gemini and optional Qdrant values are encrypted in MongoDB and never returned to the browser. The entered token stays only in browser memory. `MONGO_URI` remains a deployment secret so the settings store is available after a restart.
 
 ## Deploy on Render
 
@@ -78,6 +80,5 @@ app/controllers  HTTP endpoints
 app/models       Pydantic schemas
 app/repositories SQLite and MongoDB persistence
 app/services     LangChain agent, RAG, and runtime settings
-app/templates    HTML views
-app/static       CSS and browser JavaScript
+frontend/        React showcase interface and settings drawer
 ```

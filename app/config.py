@@ -28,7 +28,7 @@ class AppConfig:
     def from_env(cls) -> "AppConfig":
         return cls(
             app_env=os.getenv("APP_ENV", "development"),
-            app_name=os.getenv("APP_NAME", "WE Telecom AI Agent"),
+            app_name=os.getenv("APP_NAME", "Nile Connect Support AI"),
             google_api_key=os.getenv("GOOGLE_API_KEY", ""),
             mongo_uri=os.getenv("MONGO_URI", "mongodb://mongo:27017"),
             mongo_db=os.getenv("MONGO_DB", "we_telecom_db"),
