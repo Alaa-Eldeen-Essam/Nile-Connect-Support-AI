@@ -105,13 +105,68 @@ Build from the Dockerfile; do **not** use `docker commit` on a running container
 
 ```powershell
 docker login
-docker build -t <dockerhub-user>/nile-customer-support-agent:latest .
-docker push <dockerhub-user>/nile-customer-support-agent:latest
+docker build -t alaaeldeenessam/nile-customer-support-agent:latest .
+docker push alaaeldeenessam/nile-customer-support-agent:latest
 ```
 
 The normal Docker build does not include `.env`: `.dockerignore` excludes it and the Dockerfile does not copy it. Secrets are supplied only when a container starts.
 
-The published `web` image is not a complete standalone installation. It also needs MongoDB and Qdrant. The easiest way for another person to run the full project is to clone this repository, create their own `.env`, and use `docker compose up --build`. If they use only the published image, they must provide reachable MongoDB and Qdrant services plus their own runtime secrets.
+## Run the published Docker image
+
+The published web image is `alaaeldeenessam/nile-customer-support-agent:latest`.
+It needs MongoDB and Qdrant, so use the commands below to run the complete stack without cloning or building this repository.
+
+1. Create a local `.env` file in the directory where you will run Docker, then fill in your three secrets:
+
+   ```env
+   APP_ENV=development
+   APP_NAME=Nile Connect Support AI
+   PROFILE_STORAGE=sqlite
+   QDRANT_MODE=container
+   QDRANT_URL=http://qdrant:6333
+   QDRANT_COLLECTION=we_knowledge_base
+   MONGO_DB=we_telecom_db
+   SQLITE_PATH=data/we_telecom.db
+
+   GOOGLE_API_KEY=your_google_gemini_api_key
+   MONGO_URI=mongodb://mongo:27017
+   SETTINGS_ENCRYPTION_KEY=your_fernet_key
+   SETTINGS_ADMIN_TOKEN=your_long_random_admin_token
+   QDRANT_API_KEY=
+   ```
+
+   Never upload or share this `.env` file.
+
+2. Create a private Docker network and start the two data services:
+
+   ```powershell
+   docker network create nile-connect
+   docker run -d --name nile-connect-mongo --network nile-connect --network-alias mongo -v nile-connect-mongo:/data/db mongo:8
+   docker run -d --name nile-connect-qdrant --network nile-connect --network-alias qdrant -v nile-connect-qdrant:/qdrant/storage qdrant/qdrant:v1.13.2
+   ```
+
+3. Pull and run the web image with the local secrets:
+
+   ```powershell
+   docker pull alaaeldeenessam/nile-customer-support-agent:latest
+   docker run -d --name nile-connect-web --network nile-connect -p 8010:8010 --env-file .env -v nile-connect-app-data:/app/data alaaeldeenessam/nile-customer-support-agent:latest
+   ```
+
+4. Open [http://localhost:8010](http://localhost:8010). Follow logs if needed:
+
+   ```powershell
+   docker logs -f nile-connect-web
+   ```
+
+The first chat request creates the Qdrant collection. The named volumes keep MongoDB, Qdrant, and local profile data when containers are restarted.
+
+To stop the stack without deleting data:
+
+```powershell
+docker stop nile-connect-web nile-connect-mongo nile-connect-qdrant
+```
+
+To run it again, use `docker start nile-connect-web nile-connect-mongo nile-connect-qdrant`.
 
 ## Deploy on Render
 
