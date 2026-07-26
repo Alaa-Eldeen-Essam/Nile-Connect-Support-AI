@@ -17,7 +17,7 @@ No local Python, Node.js, MongoDB, or Qdrant installation is required.
 1. Clone the repository and enter it:
 
    ```powershell
-   git clone <YOUR_REPOSITORY_URL>
+   git clone Alaa-Eldeen-Essam/Nile-Connect-Support-AI
    cd WE_agent_portoflio
    ```
 
