@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import secrets
 from typing import Callable
 
 from app.config import AppConfig
@@ -21,7 +22,8 @@ Protocol:
    billing help until it succeeds.
 3. Use search_we_knowledge_base for public telecom source material, router configuration,
    troubleshooting, and billing. Do not invent policies or claim provider affiliation.
-4. For complaints needing human follow-up, call submit_support_ticket and return its ticket ID.
+4. For complaints needing human follow-up, call submit_support_ticket. Return its friendly
+   confirmation exactly: never expose database IDs or call the request a ticket number.
 """
 
 
@@ -100,14 +102,21 @@ class AgentService:
                     "submitting a ticket."
                 )
             ticket = {
+                "reference": f"NC-{datetime.datetime.now(datetime.UTC):%Y%m%d}-{secrets.token_hex(3).upper()}",
                 "phone": phone,
                 "issue_type": issue_type,
                 "description": description,
                 "status": "Open",
                 "created_at": datetime.datetime.now(datetime.UTC),
             }
-            result = tickets.insert_one(ticket)
-            return f"Successfully submitted support ticket. Ticket ID: {result.inserted_id}"
+            tickets.insert_one(ticket)
+            return (
+                "### Support request received\n\n"
+                f"Your reference is **{ticket['reference']}**. Our demo support team will respond "
+                "within **2–3 working days**.\n\n"
+                "For this demonstration, contact **support@nileconnect.example** or the "
+                "**demo hotline +20 000 000 0000**."
+            )
 
         prompt = ChatPromptTemplate.from_messages(
             [

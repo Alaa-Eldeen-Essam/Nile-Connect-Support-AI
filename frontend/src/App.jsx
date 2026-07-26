@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   ArrowUpRight,
   ChevronRight,
@@ -187,7 +188,7 @@ function App() {
               {messages.map((item, index) => (
                 <article key={`${item.role}-${index}`} className={`message ${item.role}`}>
                   {item.role === "assistant" && <span className="message-mark">N</span>}
-                  <p>{item.text}</p>
+                  {item.role === "assistant" ? <ReactMarkdown className="markdown">{item.text}</ReactMarkdown> : <p>{item.text}</p>}
                 </article>
               ))}
               {isSending && <article className="message assistant loading"><span className="message-mark">N</span><LoaderCircle size={17} /> Thinking</article>}
