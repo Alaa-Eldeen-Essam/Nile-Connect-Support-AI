@@ -10,10 +10,10 @@ from app.repositories.mongo import MongoGateway
 from app.repositories.profiles import ProfileRepository
 from app.services.rag_service import RagService
 
-
-SYSTEM_PROMPT = """You are Nile Connect Support AI, an independent customer-support portfolio demonstration.
-You are not affiliated with, endorsed by, or operated by Telecom Egypt, WE, or another telecom provider.
-You must be professional and concise, and never claim to be an official company representative.
+SYSTEM_PROMPT = """You are Nile Connect Support AI, an independent customer-support portfolio
+demonstration. You are not affiliated with, endorsed by, or operated by Telecom Egypt, WE, or
+another telecom provider. You must be professional and concise, and never claim to be an official
+company representative.
 
 Protocol:
 1. Before answering technical or billing questions, collect name, 11-digit Egyptian phone number,
@@ -66,11 +66,11 @@ class AgentService:
         if not config.google_api_key:
             raise RuntimeError("The administrator has not configured GOOGLE_API_KEY yet.")
 
+        from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
         from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
         from langchain_core.runnables.history import RunnableWithMessageHistory
         from langchain_google_genai import ChatGoogleGenerativeAI
         from langchain_mongodb import MongoDBChatMessageHistory
-        from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 
         rag = RagService(config)
         rag.ensure_index()
@@ -81,7 +81,7 @@ class AgentService:
 
         @tool("search_we_knowledge_base")
         def search_we_knowledge_base(query: str) -> str:
-            """Search public telecom source material for support, router, billing, and plan questions."""
+            """Search public telecom source material for support, router, billing, and plans."""
             documents = rag.vector_store().similarity_search(query, k=3)
             if not documents:
                 return "No relevant source material was found."
@@ -102,23 +102,21 @@ class AgentService:
         def submit_support_ticket(phone: str, issue_type: str, description: str) -> str:
             """Save a detailed customer support ticket after a known profile is available."""
             if not profile_repository.exists(phone):
-                return (
-                    "Error: save and validate the customer's profile before "
-                    "submitting a ticket."
-                )
+                return "Error: save and validate the customer's profile before submitting a ticket."
+            created_at = datetime.datetime.now(datetime.UTC)
             ticket = {
-                "reference": f"NC-{datetime.datetime.now(datetime.UTC):%Y%m%d}-{secrets.token_hex(3).upper()}",
+                "reference": f"NC-{created_at:%Y%m%d}-{secrets.token_hex(3).upper()}",
                 "phone": phone,
                 "issue_type": issue_type,
                 "description": description,
                 "status": "Open",
-                "created_at": datetime.datetime.now(datetime.UTC),
+                "created_at": created_at,
             }
             tickets.insert_one(ticket)
             return (
                 "### Support request received\n\n"
                 f"Your reference is **{ticket['reference']}**. Our demo support team will respond "
-                "within **2–3 working days**.\n\n"
+                "within **2-3 working days**.\n\n"
                 "Keep this reference for follow-up. For this demonstration, contact "
                 "**support@nileconnect.example** or the demo hotline +20 000 000 0000**."
             )

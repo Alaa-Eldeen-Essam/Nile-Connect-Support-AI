@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from app.dependencies import services
 from app.services.application import ApplicationServices
 
-
 router = APIRouter(tags=["health"])
 
 

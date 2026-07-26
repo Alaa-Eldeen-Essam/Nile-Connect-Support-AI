@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-from app.config import AppConfig, ROOT_DIR
+from app.config import ROOT_DIR, AppConfig
 
 
 class RagService:

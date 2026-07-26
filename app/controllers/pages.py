@@ -3,7 +3,6 @@ from fastapi.responses import FileResponse
 
 from app.config import ROOT_DIR
 
-
 router = APIRouter()
 
 

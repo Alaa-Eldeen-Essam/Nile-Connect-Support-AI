@@ -11,7 +11,6 @@ from app.dependencies import services
 from app.models.schemas import ChatRequest, ChatResponse
 from app.services.application import ApplicationServices
 
-
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.config import AppConfig, ROOT_DIR
+from app.config import ROOT_DIR, AppConfig
 from app.controllers import chat, health, pages, settings
 from app.services.application import ApplicationServices
 

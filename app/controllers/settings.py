@@ -9,7 +9,6 @@ from app.dependencies import services
 from app.models.schemas import RuntimeSettingsUpdate
 from app.services.application import ApplicationServices
 
-
 router = APIRouter(tags=["settings"])
 security = HTTPBasic(auto_error=False)
 
