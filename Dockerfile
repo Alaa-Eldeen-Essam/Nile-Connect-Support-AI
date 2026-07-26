@@ -11,7 +11,7 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PORT=8000
+    PORT=8010
 
 WORKDIR /app
 COPY pyproject.toml ./
@@ -27,5 +27,5 @@ RUN pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0+cp
     && chown -R appuser:appuser /app
 
 USER appuser
-EXPOSE 8000
+EXPOSE 8010
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
