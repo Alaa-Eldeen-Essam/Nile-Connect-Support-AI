@@ -48,6 +48,11 @@ class AgentService:
         response = self._agent.invoke(
             {"input": message}, config={"configurable": {"session_id": session_id}}
         )
+        for action, observation in response.get("intermediate_steps", []):
+            if action.tool == "submit_support_ticket" and str(observation).startswith(
+                "### Support request received"
+            ):
+                return str(observation)
         output = response["output"]
         if isinstance(output, list):
             return "".join(
@@ -114,8 +119,8 @@ class AgentService:
                 "### Support request received\n\n"
                 f"Your reference is **{ticket['reference']}**. Our demo support team will respond "
                 "within **2–3 working days**.\n\n"
-                "For this demonstration, contact **support@nileconnect.example** or the "
-                "**demo hotline +20 000 000 0000**."
+                "Keep this reference for follow-up. For this demonstration, contact "
+                "**support@nileconnect.example** or the demo hotline +20 000 000 0000**."
             )
 
         prompt = ChatPromptTemplate.from_messages(
@@ -135,6 +140,7 @@ class AgentService:
             tools=[search_we_knowledge_base, save_user_profile, submit_support_ticket],
             verbose=not config.is_production,
             handle_parsing_errors=True,
+            return_intermediate_steps=True,
         )
 
         def history(session_id: str):

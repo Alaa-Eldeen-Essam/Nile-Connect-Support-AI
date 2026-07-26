@@ -188,7 +188,7 @@ function App() {
               {messages.map((item, index) => (
                 <article key={`${item.role}-${index}`} className={`message ${item.role}`}>
                   {item.role === "assistant" && <span className="message-mark">N</span>}
-                  {item.role === "assistant" ? <ReactMarkdown className="markdown">{item.text}</ReactMarkdown> : <p>{item.text}</p>}
+                  {item.role === "assistant" ? <div className="markdown"><ReactMarkdown>{item.text}</ReactMarkdown></div> : <p>{item.text}</p>}
                 </article>
               ))}
               {isSending && <article className="message assistant loading"><span className="message-mark">N</span><LoaderCircle size={17} /> Thinking</article>}
